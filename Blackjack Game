@@ -51,7 +51,7 @@ int main()
         ev_double=player_double(pc1+pc2, (pc1==1?1:0) + (pc2==1?1:0), deck);
         cerr << "EV Stand =\t" << ev_stand << "\n";
         cerr << "EV Hit =\t" << ev_hit << "\n";
-        cer << "EV Double =\t" << ev_double << "\n";
+        cerr << "EV Double =\t" << ev_double << "\n";
     }
     //cerr << "Greetings to you, human!\n";
     //cerr << "You are now in the presence of me, the Toymaker!\n";
