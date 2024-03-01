@@ -126,12 +126,7 @@ double player_double(int ptot, int pace, int deck[])
             probability=(double)deck[next_card]/(double)deck[0];
             deck[next_card]--;
             deck[0]--;
-            ev_stand=player_stand(ptot+next_card,pace+(next_card==1?1:0),cards+1,deck);
-            if (ptot+next_card<17)
-                ev_hit_again=player_hit(ptot+next_card,pace+(next_card==1?1:0),cards+1,deck);
-            else
-                ev_hit_again=-1;
-            ev_hit+=probability*max2(ev_stand,ev_hit_again);
+            ev_double+=prob*player_stand(ptot+next_card,pace+(next_card==1?1:0),3,deck);
             deck[next_card]++;
             deck[0]++;
         }
