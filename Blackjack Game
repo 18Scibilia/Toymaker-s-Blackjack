@@ -1,6 +1,8 @@
+#include "Blackjack.h"
 #include <iostream>
+#include <string>
 
-using namespace std;
+using namespace std::basic_istream;
 
 double player_stand(int ptot, int pace, int cards, int deck[]);
 double player_hit(int ptot, int pace, int cards, int deck[]);
@@ -8,92 +10,162 @@ double player_double(int ptot, int pace, int deck[]);
 double player_split(int ptot, int pace, int deck[]);
 void dealer(int old_total, int old_ace, int cards, double probability, int deck[], double dealer_probability[]);
 double max2(double x, double y);
+int prob();
+void IntroScene();
 
 int numdeck = 6;
 int upcard;
 
 int main()
 {
-    int ch,i,j,deck[11],pc1,pc2;
-    double dealer_probability[7],ev_stand,ev_hit,ev_double,ev_split;
-    for (i=1; i<=9, i++)
-        deck[i]=4*numdeck;
-    deck[10]=16*numdeck;
-    deck[0]=52*numdeck;
-    cerr << "1. Dealer probabilities\n";
-    cerr << "2. Player hand\n";
-    cin >> ch;
-    if(ch==1)
+    bool skip = false;
+    std::cout << "Do you want to check out the intro?\n>[Y] or [N]\n";
+    std::string command;
+    while (true) {
+        std::cout << ">>";
+        basic_istream::getline(cin, command);
+        if (iequals(command, "Y") || iequals(command, "YES") || iequals(command, "Yes")) {
+            //cerr << "Greetings to you, human!\n";
+            //cerr << "You are now in the presence of me, the Toymaker!\n";
+            //cerr << "I challenge you to a game of Blackjack!\n";
+            //cerr << "If you defeat me, you will be free to go!\n";
+            //cerr << "If you lose, you will be my plaything for the rest of eternity!\n";
+            break; //This is the end of the loop
+        }
+        else if (iequals(command, "N") || iequals(command, "NO") || iequals(command, "No")) {
+            skip = true;
+            break; //This also concludes the loop
+        }
+        else {
+            std::cout << "The command cannot be recognized!\n";
+        }
+    }
+
+    if (!skip)
+        IntroScene();
+
+    int ch, i, j, deck[11], pc1, pc2;
+    double dealer_probability[7], ev_stand, ev_hit, ev_double, ev_split;
+    for (i = 1; i <= 9, i++;)
+        deck[i] = 4 * numdeck;
+    deck[10] = 16 * numdeck;
+    deck[0] = 52 * numdeck;
+    std::cerr << "1. Dealer probabilities\n";
+    std::cerr << "2. Player hand\n";
+    std::cerr << "3. Whole game\n";
+    std::cin >> ch;
+    if (ch == 1)
     {
-        for(i=1; i<=10; i++)
+        for (i = 1; i <= 10; i++)
         {
             cout << "Up card = " << i << "\n";
-            dealer(i,(i==1?1:0),1,1.0,deck,dealer_probability);
-            for(j-0; j<=6; j++)
+            dealer(i, (i == 1 ? 1 : 0), 1, 1.0, deck, dealer_probability);
+            for (j - 0; j <= 6; j++)
                 cout << j << "\t" << dealer_probability[j] << "\n";
             deck[i]++;
             deck[0]++;
         }
     }
-    else if(ch==2)
+    else if (ch == 2)
     {
-        cerr << "Player card 1: ";
-        cin >> pc1;
-        cerr << "Player card 2: ";
-        cin >> pc2;
-        cerr << "Dealer up card: ";
-        cin >> upcard;
+        std::cerr << "Player card 1: ";
+        std::cin >> pc1;
+        std::cerr << "Player card 2: ";
+        std::cin >> pc2;
+        std::cerr << "Dealer up card: ";
+        std::cin >> upcard;
         deck[pc1]--;
         deck[pc2]--;
         deck[upcard]--;
-        deck[0]-=3;
-        ev_stand=player_stand(pc1+pc2, (pc1==1?1:0) + (pc2==1?1:0), 2, deck);
-        ev_hit=player_hit(pc1+pc2, (pc1==1?1:0) + (pc2==1?1:0), 2, deck);
-        ev_double=player_double(pc1+pc2, (pc1==1?1:0) + (pc2==1?1:0), deck);
-        if (pc1==pc2)
-            ev_split=player_split(pc1,(pc1==1?1:0),deck);
+        deck[0] -= 3;
+        ev_stand = player_stand(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), 2, deck);
+        ev_hit = player_hit(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), 2, deck);
+        ev_double = player_double(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), deck);
+        if (pc1 == pc2)
+            ev_split = player_split(pc1, (pc1 == 1 ? 1 : 0), deck);
         else
-            ev_split=-1.0;
-        cerr << "EV Stand =\t" << ev_stand << "\n";
-        cerr << "EV Hit =\t" << ev_hit << "\n";
-        cerr << "EV Double =\t" << ev_double << "\n";
-        cerr << "EV Split =\t" << ev_split << "\n";
+            ev_split = -1.0;
+        std::cerr << "EV Stand =\t" << ev_stand << "\n";
+        std::cerr << "EV Hit =\t" << ev_hit << "\n";
+        std::cerr << "EV Double =\t" << ev_double << "\n";
+        std::cerr << "EV Split =\t" << ev_split << "\n";
     }
-    //cerr << "Greetings to you, human!\n";
-    //cerr << "You are now in the presence of me, the Toymaker!\n";
-    //cerr << "I challenge you to a game of Blackjack!\n";
-    //cerr << "If you defeat me, you will be free to go!\n";
-    //cerr << "If you lose, you will be my plaything for the rest of eternity!\n";
+    else if (ch == 3)
+    {
+        double prob = 1.0;
+        double total_prob=0.0;
+        double total_ev;
+        double max_ev;
+        for (pc1 = 1; pc1 <= 10; pc1++);
+        {
+            prob *= (double)deck[pc1] / (double)deck[0];
+            deck[pc1]--;
+            deck[0]--;
+            for (pc2 = pc1; pc2 <= 10; pc2++);
+            {
+                prob *= (pc1==pc2?1:2)*(double)deck[pc2] / (double)deck[0];
+                deck[pc2]--;
+                deck[0]--;
+                for (upcard = 1; upcard <= 10; upcard++);
+                {
+                    prob *= (double)deck[upcard] / (double)deck[0];
+                    total_prob += prob;
+                    deck[upcard]--;
+                    deck[0]--;
+                    ev_stand = player_stand(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), 2, deck);
+                    ev_hit = player_hit(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), 2, deck);
+                    ev_double = player_double(pc1 + pc2, (pc1 == 1 ? 1 : 0) + (pc2 == 1 ? 1 : 0), deck);
+                    if (pc1 == pc2)
+                        ev_split = player_split(pc1, (pc1 == 1 ? 1 : 0), deck);
+                    else
+                        ev_split = -1.0;
+                    max_ev = max2(max2(ev_hit, ev_stand),max2(ev_double,ev_split));
+                    total_ev += prob * max_ev;
+                    printf("%i,%i,%i,%f,%f,%f,%f\n", pc1, pc2, upcard, ev_stand,ev_hit,ev_double,ev_split);
+                    deck[0]++;
+                    deck[upcard]++;
+                    prob/= (double)deck[upcard] / (double)deck[0];
+                }
+                deck[0]++;
+                deck[pc2]++;
+                prob /= (pc1 == pc2 ? 1 : 2) * (double)deck[pc2] / (double)deck[0];
+            }
+            deck[0]++;
+            deck[pc1]++;
+            prob /= (double)deck[pc1] / (double)deck[0];
+        }
+        printf("Game Expected Value =\t%f\n,max_ev");
+    }
 }
 
 double player_stand(int ptot, int pace, int cards, int deck[])
 {
     double ev_stand, dealer_probability[7];
-    if ((ptot==11)&&(pace==1)&&(cards==2))
+    if ((ptot == 11) && (pace == 1) && (cards == 2))
     {
-        if ((upcard>1)&&(upcard<10)) //This means you have won Blackjack and defeated me, human!
+        if ((upcard > 1) && (upcard < 10)) //This means you have won Blackjack and defeated me, human!
             return 1.5;
         else
         {
-            dealer(upcard, (upcard==1?1:0), 1, 1.0, deck, dealer_probability);
-            return 1.5*(dealer_probability[0]+dealer_probability[1]+dealer_probability[2]+dealer_probability[3]+dealer_probability[4]+dealer_probability[6]);
-        } 
+            dealer(upcard, (upcard == 1 ? 1 : 0), 1, 1.0, deck, dealer_probability);
+            return 1.5 * (dealer_probability[0] + dealer_probability[1] + dealer_probability[2] + dealer_probability[3] + dealer_probability[4] + dealer_probability[6]);
+        }
     }
-    else if (ptot>21) //You are busted and have lost to me, human!
+    else if (ptot > 21) //You are busted and have lost to me, human!
         return -1.0;
     else
     {
-        if((ptot<=11)&&(pace>0)) //You have a soft hand.
-            ptot+=10;
-        dealer(upcard, (upcard==1?1:0), 1, 1.0, deck, dealer_probability);
-        ev_stand=dealer_probability[6];
-        ev_stand-=dealer_probability[5];
-        for (int i=0; i<=4; i++)
+        if ((ptot <= 11) && (pace > 0)) //You have a soft hand.
+            ptot += 10;
+        dealer(upcard, (upcard == 1 ? 1 : 0), 1, 1.0, deck, dealer_probability);
+        ev_stand = dealer_probability[6];
+        ev_stand -= dealer_probability[5];
+        for (int i = 0; i <= 4; i++)
         {
-            if (ptot>i+17)
-                ev_stand+=dealer_probability[i];
-            else if (ptot<i+17)
-                ev_stand-=dealer_probability[i];
+            if (ptot > i + 17)
+                ev_stand += dealer_probability[i];
+            else if (ptot < i + 17)
+                ev_stand -= dealer_probability[i];
         }
     }
     return ev_stand;
@@ -103,18 +175,18 @@ double player_hit(int ptot, int pace, int cards, int deck[])
 {
     int next_card;
     double probability, ev_stand, ev_hit, ev_hit_again;
-    ev_hit=0.0;
-    for (next_card=1; next_card<=10; next_card++)
+    ev_hit = 0.0;
+    for (next_card = 1; next_card <= 10; next_card++)
     {
-        probability=(double)deck[next_card]/(double)deck[0];
+        probability = (double)deck[next_card] / (double)deck[0];
         deck[next_card]--;
         deck[0]--;
-        ev_stand=player_stand(ptot+next_card,pace+(next_card==1?1:0),cards+1,deck);
-        if (ptot+next_card<17)
-            ev_hit_again=player_hit(ptot+next_card,pace+(next_card==1?1:0),cards+1,deck);
+        ev_stand = player_stand(ptot + next_card, pace + (next_card == 1 ? 1 : 0), cards + 1, deck);
+        if (ptot + next_card < 17)
+            ev_hit_again = player_hit(ptot + next_card, pace + (next_card == 1 ? 1 : 0), cards + 1, deck);
         else
-            ev_hit_again=-1;
-        ev_hit+=probability*max2(ev_stand,ev_hit_again);
+            ev_hit_again = -1;
+        ev_hit += probability * max2(ev_stand, ev_hit_again);
         deck[next_card]++;
         deck[0]++;
     }
@@ -125,52 +197,57 @@ double player_double(int ptot, int pace, int deck[])
 {
     int next_card;
     double probability, ev_double;
-    ev_double=0.0;
-    if(ptot>11)
+    ev_double = 0.0;
+    if (ptot > 11)
         ev_double = -1;
     else
     {
-        for (next_card=1; next_card<=10; next_card++)
+        for (next_card = 1; next_card <= 10; next_card++)
         {
-            probability=(double)deck[next_card]/(double)deck[0];
+            probability = (double)deck[next_card] / (double)deck[0];
             deck[next_card]--;
             deck[0]--;
-            ev_double+=prob*player_stand(ptot+next_card,pace+(next_card==1?1:0),3,deck);
+            ev_double += prob * player_stand(ptot + next_card, pace + (next_card == 1 ? 1 : 0), 3, deck);
             deck[next_card]++;
             deck[0]++;
         }
     }
-    return 2*ev_double;
+    return 2 * ev_double;
 }
 
 double player_split(int ptot, int pace, int deck[])
 {
     int next_card;
     double probability, ev_split, ev_stand, ev_hit;
-    ev_split=0.0;
-    for (next_card=1; next_card<=10; next_card++)
+    ev_split = 0.0;
+    for (next_card = 1; next_card <= 10; next_card++)
     {
-        probability=(double)deck[next_card]/(double)deck[0];
+        probability = (double)deck[next_card] / (double)deck[0];
         deck[next_card]--;
         deck[0]--;
-        ev_stand=player_stand(ptot+next_card,pace+(next_card==1?1:0),3,deck);
-        if(ptot==1)
-            ev_hit=-1.0;
+        ev_stand = player_stand(ptot + next_card, pace + (next_card == 1 ? 1 : 0), 3, deck);
+        if (ptot == 1)
+            ev_hit = -1.0;
         else
-            ev_hit=player_hit(ptot+next_card,pace+(next_card==1?1:0),2,deck);
-        ev_split+=probability*max2(ev_stand,ev_hit);
+            ev_hit = player_hit(ptot + next_card, pace + (next_card == 1 ? 1 : 0), 2, deck);
+        ev_split += probability * max2(ev_stand, ev_hit);
         deck[next_card]++;
         deck[0]++;
     }
-    return 2*ev_split;
+    return 2 * ev_split;
 }
 
 double max2(double x, double y)
 {
-    if(x>y)
+    if (x > y)
         return x;
     else
         return y;
+}
+
+int prob()
+{
+    return 0;
 }
 
 /*
@@ -185,35 +262,35 @@ Dealer Probability
 
 void dealer(int old_total, int old_ace, int cards, double probability, int deck[], double dealer_probability[])
 {
-    int i,next_card,new_total,new_ace;
-    if (cards==1)
+    int i, next_card, new_total, new_ace;
+    if (cards == 1)
     {
-        for (i=0; i<=6; i++)
-        dealer_probability[i]=0.0;
+        for (i = 0; i <= 6; i++)
+            dealer_probability[i] = 0.0;
     }
-    for(next_card=1; next_card<=10; next_card++)
+    for (next_card = 1; next_card <= 10; next_card++)
     {
-        probability*=(double)deck[next_card]/(double)deck[0];
+        probability *= (double)deck[next_card] / (double)deck[0];
         deck[next_card]--;
         deck[0]--;
-        new_total=old_total+next_card;
-        new_ace=old_ace+(next_card==1?1:0);
-        if((cards==1)&&(new_total==11)&&(new_ace==1)) //Well done, human. You now have blackjack!
-            dealer_probability[5]+=probability;
-            cerr << "Curses! You have blackjack!\n";
-            cerr << "I may have lost to you this time, but we shall meet again!\n";
-        else if(new_total>21) //What a pity for you, human. The number has gone over 21!
-            dealer_probability[6]+=probability;
-            cerr << "It appears that I am triumphant!\n";
-            cerr << "You are now one of my playthings for all of eternity!\n";
-        else if(new_total>=17)
-            dealer_probability[new_total-17]+=probability;
-        else if((new_total>=17) && (new_total<=11) && (new_ace>0))
-            dealer_probability[new_total-7]+=probability;
+        new_total = old_total + next_card;
+        new_ace = old_ace + (next_card == 1 ? 1 : 0);
+        if ((cards == 1) && (new_total == 11) && (new_ace == 1)) //Well done, human. You now have blackjack!
+            dealer_probability[5] += probability;
+        std::cerr << "Curses! You have blackjack!\n";
+        std::cerr << "I may have lost to you this time, but we shall meet again!\n";
+        else if (new_total > 21) //What a pity for you, human. The number has gone over 21!
+            dealer_probability[6] += probability;
+        std::cerr << "It appears that I am triumphant!\n";
+        std::cerr << "You are now one of my playthings for all of eternity!\n";
+        else if (new_total >= 17)
+            dealer_probability[new_total - 17] += probability;
+        else if ((new_total >= 17) && (new_total <= 11) && (new_ace > 0))
+            dealer_probability[new_total - 7] += probability;
         else
-            dealer(new_total, new_ace, cards+1, probability, deck, dealer_probability);
+            dealer(new_total, new_ace, cards + 1, probability, deck, dealer_probability);
         deck[0]++;
         deck[next_card]++;
-        probability/=(double)deck[next_card]/(double)deck[0];
+        probability /= (double)deck[next_card] / (double)deck[0];
     }
 }
